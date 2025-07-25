@@ -1,0 +1,10 @@
+{
+  "searchTerms": [
+    "roofers phoenix",
+    "plumbers phoenix",
+    "hvac phoenix"
+  ],
+  "scrollDelayMs": 2000,
+  "minReviews": 20,
+  "maxRank": 3
+}

@@ -1,6 +1,6 @@
-// 📁 email_lookup.js
+// 📁 email_lookup.mjs
 
-import fetch from 'node-fetch'; // ESM-compatible
+import fetch from 'node-fetch';
 import * as cheerio from 'cheerio';
 
 export async function lookupEmail(domain) {
@@ -27,7 +27,6 @@ export async function lookupEmail(domain) {
     return { email: emailMatch[0], error: null };
   }
 
-  // fallback: check contact/about page
   const $ = cheerio.load(html);
   const pages = ['a[href*="contact"]', 'a[href*="about"]'];
   for (const sel of pages) {
@@ -35,7 +34,10 @@ export async function lookupEmail(domain) {
     if (href) {
       const pageUrl = href.startsWith('http') ? href : new URL(href, url).href;
       try {
-        const r2 = await fetch(pageUrl, { headers: { 'User-Agent': 'Mozilla/5.0' }, timeout: 10000 });
+        const r2 = await fetch(pageUrl, {
+          headers: { 'User-Agent': 'Mozilla/5.0' },
+          timeout: 10000
+        });
         if (r2.ok) {
           const text2 = await r2.text();
           const m2 = text2.match(

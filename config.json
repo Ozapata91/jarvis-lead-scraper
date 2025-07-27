@@ -1,10 +1,9 @@
+// 📁 config.json
 {
   "searchTerms": [
-    "roofers phoenix",
-    "plumbers phoenix",
-    "hvac phoenix"
+    "handyman laveen az"
   ],
   "scrollDelayMs": 2000,
-  "minReviews": 20,
-  "maxRank": 3
+  "minReviews": 0,
+  "maxRank": 60
 }

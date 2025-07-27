@@ -1,9 +1,10 @@
-// 📁 audit.js
+// 📁 audit.js (ESM version)
 
-require("dotenv").config();
-const openai = require("openai");
+import dotenv from "dotenv";
+dotenv.config();
+import OpenAI from "openai";
 
-const client = new openai.OpenAI({
+const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
@@ -17,11 +18,14 @@ function getWeakPoints(lead) {
   }
 
   const reviewCount = parseInt(lead.reviewCount || "0");
-  if (reviewCount < 10) {
+  const rating = parseFloat(lead.rating || "0");
+
+  const scrapedLikelyFailed = reviewCount === 0 && rating >= 4.5;
+
+  if (!scrapedLikelyFailed && reviewCount < 10) {
     weakPoints.push("low review count");
   }
 
-  const rating = parseFloat(lead.rating || "0");
   if (rating > 0 && rating < 3.5) {
     weakPoints.push("low rating");
   }
@@ -69,17 +73,14 @@ async function getAuditBlurb(lead) {
   }
 }
 
-async function generateAudits(leads) {
+export default async function generateAudits(leads) {
   const withAudits = [];
 
   for (const lead of leads) {
     lead.auditBlurb = await getAuditBlurb(lead);
     withAudits.push(lead);
-    await new Promise(r => setTimeout(r, 1000)); // throttle
+    await new Promise(r => setTimeout(r, 1000));
   }
 
   return withAudits;
 }
-
-module.exports = generateAudits;
-

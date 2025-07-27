@@ -1,8 +1,5 @@
-// 📁 config.json
 {
-  "searchTerms": [
-    "handyman laveen az"
-  ],
+  "searchTerms": ["handyman phoenix az"],
   "scrollDelayMs": 2000,
   "minReviews": 0,
   "maxRank": 60

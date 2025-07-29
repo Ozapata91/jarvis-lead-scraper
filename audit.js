@@ -1,86 +1,51 @@
-// 📁 audit.js (ESM version)
+// 📁 audit.js
 
 import dotenv from "dotenv";
 dotenv.config();
-import OpenAI from "openai";
+import fetch from "node-fetch";
 
-const client = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-function getWeakPoints(lead) {
-  const weakPoints = [];
+export default async function generateAudit(lead) {
+  const {
+    name = "This business",
+    rating = 0,
+    reviewCount = 0,
+    mapRank = "unknown",
+    hasWebsite,
+    claimStatus,
+    category
+  } = lead;
 
-  if (!lead.website || lead.website.trim() === "") {
-    weakPoints.push("no website");
-  } else if (lead.website.match(/\.xyz|\.biz|\.site|\.info/i)) {
-    weakPoints.push("untrustworthy domain");
-  }
+  const safeCategory = category || "business";
+  const safeClaim = claimStatus || "missing";
+  const hasSite = hasWebsite === "yes" ? "has" : "does not have";
 
-  const reviewCount = parseInt(lead.reviewCount || "0");
-  const rating = parseFloat(lead.rating || "0");
+  const prompt = `
+This ${safeCategory} named "${name}" has a ${rating} star rating with ${reviewCount} reviews and is currently ranked #${mapRank} on Google Maps. The business ${hasSite} a website and the Google profile is ${safeClaim}.
 
-  const scrapedLikelyFailed = reviewCount === 0 && rating >= 4.5;
-
-  if (!scrapedLikelyFailed && reviewCount < 10) {
-    weakPoints.push("low review count");
-  }
-
-  if (rating > 0 && rating < 3.5) {
-    weakPoints.push("low rating");
-  }
-
-  return weakPoints;
-}
-
-function generatePrompt(lead) {
-  const weakPoints = getWeakPoints(lead);
-  const issues = weakPoints.join(", ");
-  const name = lead.name || "this business";
-
-  if (weakPoints.length === 0) {
-    return `Write a short, helpful SEO audit blurb for a local business with a decent presence. Keep it under 2 sentences. Mention opportunities to improve visibility or capture more leads.`;
-  }
-
-  return `Write a short SEO audit blurb (1–2 sentences max) for a local business with the following issues: ${issues}. 
-Business name: ${name}. Be specific, honest, and professional. Avoid fluff. No praise if the business has major red flags. Focus on what needs fixing to boost their Google visibility.`;
-}
-
-async function getAuditBlurb(lead) {
-  const prompt = generatePrompt(lead);
+Write a 2-line visibility audit explaining their current local presence and missed lead potential. Make it sound like expert insight, not salesy.
+`.trim();
 
   try {
-    const completion = await client.chat.completions.create({
-      model: "gpt-4",
-      messages: [
-        {
-          role: "system",
-          content:
-            "You're a local SEO specialist. You write short, honest audit blurbs for home service businesses based on real Google Maps data. Never assume anything. Keep your blurbs to 1–2 sentences and fact-based only.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      temperature: 0.4,
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENAI_API_KEY}`
+      },
+      body: JSON.stringify({
+        model: "gpt-4",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.5
+      })
     });
 
-    return completion.choices[0].message.content.trim();
+    const data = await res.json();
+    const output = data.choices?.[0]?.message?.content?.trim();
+    return output || "Visibility audit not available.";
   } catch (err) {
-    console.error("Audit error:", err.message);
-    return "Audit unavailable.";
+    console.warn("❌ Audit GPT failed:", err);
+    return "Visibility audit not available.";
   }
-}
-
-export default async function generateAudits(leads) {
-  const withAudits = [];
-
-  for (const lead of leads) {
-    lead.auditBlurb = await getAuditBlurb(lead);
-    withAudits.push(lead);
-    await new Promise(r => setTimeout(r, 1000));
-  }
-
-  return withAudits;
 }

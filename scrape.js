@@ -32,13 +32,14 @@ export default async function scrapeMaps(searchTerm) {
   }
 
   return allResults.map((place, i) => ({
-    name: place.name,
-    phone: place.formatted_phone_number || null,
-    rating: place.rating || null,
+    name: place.name || "Not Found",
+    phone: "", // placeholder, filled in later
+    email: "Not found", // placeholder
+    rating: place.rating || 0,
     reviewCount: place.user_ratings_total || 0,
-    address: place.formatted_address || null,
-    website: place.website || null,
-    businessType: place.types?.[0] || null,
-    rank: i + 1,
+    website: place.website || "", // 🟢 keep this clean
+    address: place.formatted_address || "",
+    category: place.types?.[0] || "business",
+    mapRank: i + 1,
   }));
 }

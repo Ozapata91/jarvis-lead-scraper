@@ -1,7 +1,7 @@
 // 📁 sheet_append.mjs
 
 import { google } from "googleapis";
-import getGoogleAuth from "./google_auth.js";
+import * as getGoogleAuth from "./google_auth.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -9,7 +9,7 @@ const SHEET_ID = process.env.GOOGLE_SHEET_ID;
 const SHEET_TAB = "Leads";
 
 export default async function appendToSheet(leads) {
-  const auth = getGoogleAuth();
+  const auth = getGoogleAuth.default();
   const sheets = google.sheets({ version: "v4", auth });
 
   const values = leads.map((lead) => [

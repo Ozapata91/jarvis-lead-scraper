@@ -1,6 +1,6 @@
 {
-  "searchTerms": ["handyman phoenix az"],
-  "scrollDelayMs": 2000,
+  "searchTerm": "handyman phoenix az",
   "minReviews": 0,
-  "maxRank": 60
+  "maxRank":50,
+  "requireWebsite": false
 }

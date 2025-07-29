@@ -1,23 +1,14 @@
 // 📁 google_auth.js
 
-require("dotenv").config();
-const { google } = require("googleapis");
+import dotenv from "dotenv";
+dotenv.config();
 
-const {
-  GOOGLE_CLIENT_ID,
-  GOOGLE_CLIENT_SECRET,
-  GOOGLE_REDIRECT_URI,
-  GOOGLE_REFRESH_TOKEN
-} = process.env;
+import { google } from "googleapis";
 
-function getGoogleAuth(scopes = ["https://www.googleapis.com/auth/spreadsheets"]) {
-  const auth = new google.auth.OAuth2(
-    GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET,
-    GOOGLE_REDIRECT_URI
-  );
-  auth.setCredentials({ refresh_token: GOOGLE_REFRESH_TOKEN });
-  return auth;
+export default function getGoogleAuth() {
+  return new google.auth.JWT({
+    email: process.env.GOOGLE_SERVICE_EMAIL,
+    key: process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+    scopes: ["https://www.googleapis.com/auth/spreadsheets"]
+  });
 }
-
-module.exports = getGoogleAuth;

@@ -5,8 +5,8 @@ import dotenv from "dotenv";
 dotenv.config();
 import fetch from "node-fetch";
 
-const config = JSON.parse(await fs.readFile("./config.json", "utf-8"));
 const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
+console.log("Google Maps key:", API_KEY);
 
 export default async function scrapeMaps(searchTerm) {
   const allResults = [];
@@ -32,14 +32,14 @@ export default async function scrapeMaps(searchTerm) {
   }
 
   return allResults.map((place, i) => ({
-    name: place.name || "Not Found",
-    phone: "", // placeholder, filled in later
-    email: "Not found", // placeholder
-    rating: place.rating || 0,
+    name: place.name,
+    phone: place.formatted_phone_number || null,
+    rating: place.rating || null,
     reviewCount: place.user_ratings_total || 0,
-    website: place.website || "", // 🟢 keep this clean
-    address: place.formatted_address || "",
-    category: place.types?.[0] || "business",
-    mapRank: i + 1,
+    address: place.formatted_address || null,
+    website: place.website || null,
+    businessType: place.types?.[0] || null,
+    // mapRank instead of rank so filters.js can see it
+    mapRank: i + 1
   }));
 }

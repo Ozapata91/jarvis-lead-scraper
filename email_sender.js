@@ -1,6 +1,5 @@
 // 📁 email_sender.js
 
-require("dotenv").config();
 const { google } = require("googleapis");
 const nodemailer = require("nodemailer");
 const { OAuth2 } = google.auth;
@@ -26,30 +25,3 @@ async function sendEmail({ to, subject, html }) {
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
-      auth: {
-        type: "OAuth2",
-        user: GMAIL_USER,
-        clientId: GOOGLE_CLIENT_ID,
-        clientSecret: GOOGLE_CLIENT_SECRET,
-        refreshToken: GOOGLE_REFRESH_TOKEN,
-        accessToken: token,
-      }
-    });
-
-    const mailOptions = {
-      from: `Jarvis AI <${GMAIL_USER}>`,
-      to,
-      replyTo: GMAIL_USER,
-      subject,
-      html
-    };
-
-    const result = await transporter.sendMail(mailOptions);
-    console.log("📧 Email sent to", to, "| Message ID:", result.messageId);
-    return result;
-  } catch (err) {
-    console.error("❌ Failed to send email:", err.message);
-  }
-}
-
-module.exports = sendEmail;

@@ -1,7 +1,5 @@
 // 📁 owner_guess.js
 
-import dotenv from "dotenv";
-dotenv.config();
 import fetch from "node-fetch";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -28,21 +26,3 @@ If unsure, return:
       },
       body: JSON.stringify({
         model: "gpt-4",
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.3
-      })
-    });
-
-    const raw = await res.json();
-    const output = raw.choices?.[0]?.message?.content?.trim();
-    const parsed = JSON.parse(output);
-    return parsed.name || "Not Found";
-  } catch (err) {
-    console.warn("❌ Owner guess failed:", err);
-    return "Not Found";
-  }
-}
-
-export default async function guessOwnerName(name) {
-  return await callGPT(name);
-}
